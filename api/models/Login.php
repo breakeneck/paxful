@@ -1,10 +1,10 @@
 <?php
 
-namespace app\apiModels;
+namespace app\api\models;
 
 use yii\base\Model;
 
-class Login extends Model implements ApiModelInterface
+class Login extends Model implements \app\api\ModelInterface
 {
     public $username;
     public $password;
@@ -23,7 +23,7 @@ class Login extends Model implements ApiModelInterface
         ];
     }
 
-    public function getAccessToken()
+    private function getAccessToken()
     {
         $user = $this->getUser();
         $user->access_token = \Yii::$app->security->generateRandomKey();
@@ -32,7 +32,7 @@ class Login extends Model implements ApiModelInterface
         return $user->access_token;
     }
 
-    public function getUser()
+    private function getUser()
     {
         $user = \app\models\User::findOne(['name' => $this->username]);
         if ($user && $user->validatePassword($this->password)) {
