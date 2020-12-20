@@ -57,4 +57,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return new UserQuery(get_called_class());
     }
+
+    public function getWallet()
+    {
+        return $this->hasOne(Wallet::class, ['user_id' => 'id']);
+    }
 }
