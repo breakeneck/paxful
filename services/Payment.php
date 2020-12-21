@@ -1,6 +1,6 @@
 <?php
 
-namespace app\services\Payment;
+namespace app\services;
 
 use app\models\Transaction;
 use app\models\User;
@@ -10,44 +10,43 @@ class Payment
     const COMMISSION_PERCENT = 1.5;
     const SYSTEM_USER_ID = 1;
 
-    private $source_user_id;
-    private $dest_user_id;
+    private $payer;
+    private $receiver;
+    private $systemUser;
 
     private $amount;
     private $commision;
     private $commisionedAmount;
 
-    public function getSystemUser()
+    public function __construct()
     {
-        return User::findOne(['id' => self::SYSTEM_USER_ID]);
+        $this->systemUser = User::findOne(['id' => self::SYSTEM_USER_ID]);
     }
 
-    public function setUsersFromApiModel(\app\api\models\Payment $model)
+    public function setUsersFromApiModel(\app\api\models\Pay $model)
     {
-        $this->source_user_id = $model->getAuthenticatedUserId();
-        $this->dest_user_id = $model->dest_user_id;
+        $this->payer = User::findOne(['id' => $model->getAuthenticatedUserId()]);
+        $this->receiver = User::findOne(['id' => $model->dest_user_id]);
     }
 
     public function pay($amount)
     {
         $this->setAmount($amount);
 
-        $transaction = $this->getTransactionModel();
-
-        if ($this->payerHasNotEnoughMoney($transaction)) {
+        if ($this->payerHasNotEnoughMoney()) {
             throw new \Exception('Not enough money on wallet');
         }
 
-        $this->updateUsersWallets($transaction);
+        $this->updateUsersWallets();
 
-        $transaction->save();
+        $this->createTransaction();
 
         return true;
     }
 
-    private function payerHasNotEnoughMoney($transaction)
+    private function payerHasNotEnoughMoney()
     {
-        return $this->commisionedAmount > $transaction->getSourceUser()->getWallet()->amount;
+        return $this->commisionedAmount > $this->payer->wallet->amount;
     }
 
     private function setAmount($amount)
@@ -57,27 +56,26 @@ class Payment
         $this->amount = $amount;
     }
 
-    private function getTransactionModel()
+    private function createTransaction()
     {
         $transaction = new Transaction();
-        $transaction->dest_user_id = $this->dest_user_id;
-        $transaction->source_user_id = $this->source_user_id;
+        $transaction->source_user_id = $this->payer->id;
+        $transaction->dest_user_id = $this->receiver->id;
         $transaction->amount = $this->amount;
+        $transaction->save();
         return $transaction;
     }
 
-    private function updateUsersWallets(Transaction $transaction)
+    private function updateUsersWallets()
     {
-        $commission = $this->commisionedAmount - $this->amount;
-        $systemUser = $this->getSystemUser();
-        $systemUser->getWallet()->amount += $commission;
-        $systemUser->save();
+        $this->payer->wallet->amount -= $this->commisionedAmount;
+        $this->payer->wallet->save();
 
-        $transaction->getDestUser()->amount += $this->amount;
-        $transaction->getDestUser()->save();
+        $this->receiver->wallet->amount += $this->amount;
+        $this->receiver->wallet->save();
 
-        $transaction->getSourceUser()->amount -= $this->commisionedAmount;
-        $transaction->getDestUser()->save();
+        $this->systemUser->wallet->amount += $this->commision;
+        $this->systemUser->wallet->save();
     }
 
 }

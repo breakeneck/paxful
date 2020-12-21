@@ -4,7 +4,7 @@ namespace app\api\models;
 
 use app\models\Wallet;
 
-class Payment extends \app\api\SecureModel implements \app\api\ModelInterface, \app\api\SecureModelInterface
+class Pay extends \app\api\SecureModel implements \app\api\ModelInterface, \app\api\SecureModelInterface
 {
     const SUCCESS = 'success';
 
@@ -16,7 +16,7 @@ class Payment extends \app\api\SecureModel implements \app\api\ModelInterface, \
         return array_merge(
             parent::rules(),
             [
-                ['dest_user_id', 'numerical']
+                [['dest_user_id'], 'number']
             ]);
     }
 
@@ -29,7 +29,7 @@ class Payment extends \app\api\SecureModel implements \app\api\ModelInterface, \
 
     private function pay()
     {
-        $service = new \app\services\Payment\Payment();
+        $service = new \app\services\Payment();
         $service->setUsersFromApiModel($this);
         if ($service->pay($this->amount)) {
             return self::SUCCESS;

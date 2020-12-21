@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use app\api\Handler;
 use app\api\models\Login;
-use app\api\models\Payment;
+use app\api\models\Pay;
 use yii\web\Controller;
 
 class ApiController extends Controller
@@ -33,6 +33,6 @@ class ApiController extends Controller
 
     public function actionPay()
     {
-        Handler::processAndSendResponse(new Payment());
+        Handler::processAndSendResponse(new Pay());
     }
 }
