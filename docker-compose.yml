@@ -1,4 +1,8 @@
 version: '2'
+
+networks:
+  internal:
+
 services:
   php:
     image: yiisoftware/yii2-php:7.4-apache
@@ -7,3 +11,20 @@ services:
       - ./:/app:delegated
     ports:
       - '8000:80'
+    networks:
+      - internal
+
+  mysql:
+    image: mysql:5.7.29
+    container_name: mysql
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3300:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=pass
+      - MYSQL_DATABASE=basic
+      - MYSQL_PASSWORD=pass
+      - SERVICE_NAME=mysql
+    networks:
+      - internal
