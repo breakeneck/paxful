@@ -9,6 +9,23 @@ use yii\web\Controller;
 
 class ApiController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => \yii\filters\VerbFilter::class,
+                'actions' => [
+                    '*' => ['POST']
+                ],
+            ],
+        ];
+    }
+
+    public function beforeAction($action) {
+        $this->enableCsrfValidation = false;
+        return parent::beforeAction($action);
+    }
+
     public function actionLogin()
     {
         Handler::processAndSendResponse(new Login());

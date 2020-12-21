@@ -12,7 +12,7 @@ class Login extends Model implements \app\api\ModelInterface
     public function rules()
     {
         return [
-            ['username', 'password', 'safe']
+            [['username', 'password'], 'safe']
         ];
     }
 
@@ -26,7 +26,7 @@ class Login extends Model implements \app\api\ModelInterface
     private function getAccessToken()
     {
         $user = $this->getUser();
-        $user->access_token = \Yii::$app->security->generateRandomKey();
+        $user->access_token = \Yii::$app->security->generateRandomString();
         $user->save();
 
         return $user->access_token;

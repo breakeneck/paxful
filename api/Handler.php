@@ -8,7 +8,7 @@ class Handler
     public static function processAndSendResponse(ModelInterface $model)
     {
         try {
-            $model->attributes = self::getAttributesFromRequest();
+            $model->setAttributes( self::getAttributesFromRequest() );
 
             if ($model instanceof SecureModelInterface) {
                 if (! $model->authenticate()) {
@@ -27,7 +27,7 @@ class Handler
 
     private static function getAttributesFromRequest()
     {
-        return json_decode(\Yii::$app->request->rawBody);
+        return json_decode(\Yii::$app->request->rawBody, true);
     }
 
     public static function sendResponse($response)
