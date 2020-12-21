@@ -16,7 +16,7 @@ class Pay extends \app\api\SecureModel implements \app\api\ModelInterface, \app\
         return array_merge(
             parent::rules(),
             [
-                [['dest_user_id'], 'number']
+                [['dest_user_id', 'amount'], 'number']
             ]);
     }
 

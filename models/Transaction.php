@@ -72,6 +72,6 @@ class Transaction extends \yii\db\ActiveRecord
      */
     public function getSourceUser()
     {
-        return $this->hasOne(User::class, ['id' => 'dest_user_id']);
+        return $this->hasOne(User::class, ['id' => 'source_user_id']);
     }
 }
