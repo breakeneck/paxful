@@ -32,7 +32,7 @@ class Handler
 
     public static function sendResponse($response)
     {
-        echo self::format($response);
+        die(self::format($response));
     }
 
     private static function format($response)
